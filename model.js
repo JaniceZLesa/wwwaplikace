@@ -12,7 +12,7 @@ class GameModel {
         this.aliens = [];
         this.baseAlienRows = 2;
         this.baseAlienCols = 4;
-        this.alienSpeedX = 2; // Rychlost pohybu mimozemšťanů do stran
+        this.alienSpeedX = 1; // Rychlost pohybu mimozemšťanů do stran
         this.alienDirection = 1; // 1 = doprava, -1 = doleva
         this.score = 0;
         this.highScores = this.getHighScores();
@@ -28,8 +28,8 @@ class GameModel {
                 this.aliens.push({
                     x: col * 40 + 25,
                     y: row * 30 + 20,
-                    width: 30,
-                    height: 30,
+                    width: 25,
+                    height: 25,
                     imageSrc: 'alien.png',
                     alive: true,
                 });
