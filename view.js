@@ -39,7 +39,7 @@ class GameView {
 
     displayScore(score, highScore) {
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '16px Arial';
+        this.ctx.font = '10px Arial';
         this.ctx.fillText(`Score: ${score}`, 10, 20);
         this.ctx.fillText(`High Score: ${highScore}`, 10, 40);
     }

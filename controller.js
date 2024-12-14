@@ -33,8 +33,8 @@ class GameController {
         const { player, bullets, aliens } = this.model;
 
         // Pohyb hráče
-        if (this.keys.left) player.x -= 5;
-        if (this.keys.right) player.x += 5;
+        if (this.keys.left) player.x -= 4;
+        if (this.keys.right) player.x += 4;
         if (player.x < 0) player.x = 0;
         if (player.x > this.view.width - player.width) player.x = this.view.width - player.width;
 
@@ -88,11 +88,11 @@ class GameController {
 
     endGame() {
         this.gameOver = true;
-        const name = prompt("Game Over! Enter your name for the high score table:");
+        const name = prompt("KONEC HRY! ové nejvyšší skóre. Napiš své jméno:");
         if (name) {
             this.model.saveHighScore(name, this.model.score);
         }
-        alert("Game Over! Refresh the page to play again.");
+        alert("KONEC HRY! Refreshuj stránku a začni znovu.");
     }
 
     gameLoop() {
