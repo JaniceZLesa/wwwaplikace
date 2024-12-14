@@ -12,9 +12,14 @@ class GameView {
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
+    drawImage(entity) {
+        const img = new Image();
+        img.src = entity.imageSrc;
+        this.ctx.drawImage(img, entity.x, entity.y, entity.width, entity.height);
+    }
+
     drawPlayer(player) {
-        this.ctx.fillStyle = player.color;
-        this.ctx.fillRect(player.x, player.y, player.width, player.height);
+        this.drawImage(player);
     }
 
     drawBullets(bullets) {
@@ -27,8 +32,7 @@ class GameView {
     drawAliens(aliens) {
         aliens.forEach((alien) => {
             if (alien.alive) {
-                this.ctx.fillStyle = alien.color;
-                this.ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
+                this.drawImage(alien);
             }
         });
     }
