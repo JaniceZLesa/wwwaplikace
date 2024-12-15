@@ -88,11 +88,11 @@ class GameController {
 
     endGame() {
         this.gameOver = true;
-        const name = prompt("KONEC HRY! ové nejvyšší skóre. Napiš své jméno:");
+        const name = prompt("KONEC HRY! Nové nejvyšší skóre. Napiš své jméno:");
         if (name) {
             this.model.saveHighScore(name, this.model.score);
         }
-        alert("KONEC HRY! Refreshuj stránku a začni znovu.");
+        alert("KONEC HRY! Obnov stránku a začni znovu.");
     }
 
     gameLoop() {
