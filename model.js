@@ -1,88 +1,71 @@
 class GameModel {
     constructor() {
-        this.currentLevel = 1;
-        this.player = {
-            x: 135,
-            y: 360,
-            width: 30,
-            height: 30,
-            imageSrc: 'player.png',
-        };
+        this.player = { x: 250, y: 550, width: 50, height: 50, lives: 3 };
         this.bullets = [];
         this.aliens = [];
-        this.baseAlienRows = 2;
-        this.baseAlienCols = 4;
-        this.alienSpeedX = 1; // Rychlost pohybu mimozemšťanů do stran
-        this.alienDirection = 1; // 1 = doprava, -1 = doleva
+        this.level = 1;
         this.score = 0;
-        this.highScores = this.getHighScores();
-        this.createAliens();
+        this.gameOver = false;
+        this.gameWon = false;
     }
 
     createAliens() {
+        const rows = 2 + this.level - 1;
+        const cols = 4 + this.level - 1;
         this.aliens = [];
-        const alienRows = this.baseAlienRows + (this.currentLevel - 1);
-        const alienCols = this.baseAlienCols + (this.currentLevel - 1);
-        for (let row = 0; row < alienRows; row++) {
-            for (let col = 0; col < alienCols; col++) {
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
                 this.aliens.push({
-                    x: col * 40 + 25,
-                    y: row * 30 + 20,
-                    width: 25,
-                    height: 25,
-                    imageSrc: 'alien.png',
-                    alive: true,
+                    x: 50 + col * 50,
+                    y: 50 + row * 50,
+                    width: 40,
+                    height: 40,
+                    dx: 1,
+                    dy: 0
                 });
             }
         }
     }
 
     updateAliens() {
-        let reachedEdge = false;
-
-        this.aliens.forEach((alien) => {
-            if (alien.alive) {
-                alien.x += this.alienSpeedX * this.alienDirection;
-
-                // Kontrola dosažení okraje
-                if (alien.x <= 0 || alien.x + alien.width >= 300) {
-                    reachedEdge = true;
-                }
+        let moveDown = false;
+        for (let alien of this.aliens) {
+            alien.x += alien.dx;
+            if (alien.x <= 0 || alien.x + alien.width >= 500) {
+                moveDown = true;
             }
-        });
+        }
 
-        // Pokud mimozemšťané dosáhli okraje, posun dolů
-        if (reachedEdge) {
-            this.alienDirection *= -1; // Změna směru
-            this.aliens.forEach((alien) => {
-                if (alien.alive) {
-                    alien.y += 30; // Posun dolů
-                }
-            });
+        if (moveDown) {
+            for (let alien of this.aliens) {
+                alien.dx *= -1;
+                alien.y += 20;
+            }
         }
     }
 
     checkCollisionWithPlayer() {
-        return this.aliens.some((alien) => {
-            return (
-                alien.alive &&
+        for (let alien of this.aliens) {
+            if (
+                alien.y + alien.height >= this.player.y &&
                 alien.x < this.player.x + this.player.width &&
-                alien.x + alien.width > this.player.x &&
-                alien.y < this.player.y + this.player.height &&
-                alien.y + alien.height > this.player.y
-            );
-        });
-    }
-
-    getHighScores() {
-        return JSON.parse(localStorage.getItem('highScores')) || [];
+                alien.x + alien.width > this.player.x
+            ) {
+                this.gameOver = true;
+            }
+        }
     }
 
     saveHighScore(name, score) {
-        const highScores = this.getHighScores();
-        highScores.push({ name, score });
-        highScores.sort((a, b) => b.score - a.score); // Seřadit dle skóre
-        highScores.splice(10); // Omezit na top 10
-        localStorage.setItem('highScores', JSON.stringify(highScores));
+        let scores = JSON.parse(localStorage.getItem("highScores")) || [];
+        scores.push({ name, score });
+        scores.sort((a, b) => b.score - a.score);
+        scores = scores.slice(0, 5);
+        localStorage.setItem("highScores", JSON.stringify(scores));
+    }
+
+    getHighScores() {
+        return JSON.parse(localStorage.getItem("highScores")) || [];
     }
 }

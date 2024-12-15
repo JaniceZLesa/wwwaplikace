@@ -1,46 +1,44 @@
 class GameView {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.width = 300;
-        this.height = 400;
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
-    }
-
-    clear() {
-        this.ctx.clearRect(0, 0, this.width, this.height);
-    }
-
-    drawImage(entity) {
-        const img = new Image();
-        img.src = entity.imageSrc;
-        this.ctx.drawImage(img, entity.x, entity.y, entity.width, entity.height);
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
     }
 
     drawPlayer(player) {
-        this.drawImage(player);
-    }
-
-    drawBullets(bullets) {
-        bullets.forEach((bullet) => {
-            this.ctx.fillStyle = bullet.color;
-            this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-        });
+        const playerImage = new Image();
+        playerImage.src = "player.png";
+        this.ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
     }
 
     drawAliens(aliens) {
-        aliens.forEach((alien) => {
-            if (alien.alive) {
-                this.drawImage(alien);
-            }
-        });
+        const alienImage = new Image();
+        alienImage.src = "alien.png";
+        for (let alien of aliens) {
+            this.ctx.drawImage(alienImage, alien.x, alien.y, alien.width, alien.height);
+        }
     }
 
-    displayScore(score, highScore) {
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '10px Arial';
-        this.ctx.fillText(`Score: ${score}`, 10, 20);
-        this.ctx.fillText(`High Score: ${highScore}`, 10, 40);
+    drawBullets(bullets) {
+        this.ctx.fillStyle = "red";
+        for (let bullet of bullets) {
+            this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+        }
+    }
+
+    displayText(message) {
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "30px Arial";
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(message, this.canvas.width / 2, this.canvas.height / 2);
+    }
+
+    updateHighScoreTable(highScores) {
+        const scoreList = document.getElementById("scoreList");
+        scoreList.innerHTML = "";
+        highScores.forEach((score) => {
+            const li = document.createElement("li");
+            li.textContent = `${score.name}: ${score.score}`;
+            scoreList.appendChild(li);
+        });
     }
 }
