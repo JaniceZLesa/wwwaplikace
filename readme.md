@@ -1,5 +1,5 @@
 # Space Invaders
-
+Tento projekt je jednoduchá arkádová hra vytvořená pomocí JavaScriptu, kde hráč ovládá vesmírný člun, střílí na mimozemšťany a sbírá body. 
 ### Funkční specifikace:
 
 #### 1. Datový konceptuální model:
@@ -57,10 +57,10 @@ Datový konceptuální model se zaměřuje na uchování informací o herním st
 
 #### 1. Datový logický model:
 
-Datový model zůstává v logické struktuře jako kolekce objektů (array) v paměti pro aktuální stav hry. Důležitými objekty jsou:
+Datový model zůstává v logické struktuře jako pole objektů v paměti pro aktuální stav hry. Důležitými objekty jsou:
 
-* **Aliens** : Array s objekty typu "alien", kterými jsou jednotliví mimozemšťané.
-* **Bullets** : Array pro uchování všech aktivních střel.
+* **Aliens** : Pole s objekty typu "alien", kterými jsou jednotliví mimozemšťané.
+* **Bullets** : Pole pro uchování všech aktivních střel.
 * **GameState** : Obsahuje informace o skóre a stavu hry (např. `gameOver`).
 
 #### 2. Popis architektury a jejích jednotlivých částí:
@@ -71,7 +71,7 @@ Aplikace se skládá z následujících částí:
 * **CSS** : Definuje vzhled stránky, včetně pozadí herní desky a stylu textů.
 * **JavaScript** : Hlavní logika hry, včetně vykreslování herních objektů na plátno, pohybu a interakce s hráčem, a ukládání výsledků.
 
-#### 3. Popis tříd včetně základních funkcí:
+##### 3. Popis tříd včetně základních funkcí:
 
 * **Game (Hra)** :
 * `loadHighScores()`: Načte uložené vysoké skóre z localStorage.
@@ -87,7 +87,7 @@ Aplikace se skládá z následujících částí:
 * **Alien (Mimozemšťan)** :
 * Reprezentuje jednotlivého mimozemšťana a jeho pohyb po herní desce.
 
-#### 4. Použité technologie a funkčnosti jednotlivých částí aplikace:
+##### 4. Použité technologie a funkčnosti jednotlivých částí aplikace:
 
 * **HTML** :
 * `<canvas>` pro vykreslení herní plochy.
@@ -100,5 +100,3 @@ Aplikace se skládá z následujících částí:
 * Vykreslování mimozemšťanů a jejich pohybu.
 * Zpracování kolizí mezi střelami a mimozemšťany.
 * Ukládání a zobrazení výsledků v LocalStorage.
-
-Tento dokument popisuje základní strukturu a funkčnost aplikace Space Invaders a její technické řešení.
