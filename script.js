@@ -76,7 +76,7 @@ window.onload = function() {
     hraciPole.height = vyskaHracihoPole;
     kontext = hraciPole.getContext("2d");
 
-    //load images
+    //obrázky
     lodImg = new Image();
     lodImg.src = "./lod.png";
     lodImg.onload = function() {
@@ -85,10 +85,10 @@ window.onload = function() {
 
     mimozemstanImg = new Image();
     mimozemstanImg.src = "./mimozemstan.png";
-    createAliens();
+    vytvorMimozemstany();
 
     requestAnimationFrame(update);
-    document.addEventListener("keydown", moveShip);
+    document.addEventListener("keydown", pohniLodi);
     document.addEventListener("keyup", shoot);
 }
 
@@ -96,7 +96,7 @@ function update() {
     requestAnimationFrame(update);
 
     if (konecHry) {
-        endGame();
+        upozorneniNaKonecHry();
         return;
     }
 
@@ -107,23 +107,23 @@ function update() {
 
     //mimozemšťan
     for (let i = 0; i < poleMimozemstanu.length; i++) {
-        let alien = poleMimozemstanu[i];
-        if (alien.alive) {
-            alien.x += mimozemstanRychlostX;
+        let mimozemstan = poleMimozemstanu[i];
+        if (mimozemstan.alive) {
+            mimozemstan.x += mimozemstanRychlostX;
 
             //když se mimozemšťan dotkne hranice pole
-            if (alien.x + alien.width >= hraciPole.width || alien.x <= 0) {
+            if (mimozemstan.x + mimozemstan.width >= hraciPole.width || mimozemstan.x <= 0) {
                 mimozemstanRychlostX *= -1;
-                alien.x += mimozemstanRychlostX*2;
+                mimozemstan.x += mimozemstanRychlostX*2;
 
                 //pohyb všech mimozemšťanů v řadě
                 for (let j = 0; j < poleMimozemstanu.length; j++) {
                     poleMimozemstanu[j].y += vyskaMimozemstana;
                 }
             }
-            kontext.drawImage(mimozemstanImg, alien.x, alien.y, alien.width, alien.height);
+            kontext.drawImage(mimozemstanImg, mimozemstan.x, mimozemstan.y, mimozemstan.width, mimozemstan.height);
 
-            if (alien.y >= lod.y) {
+            if (mimozemstan.y >= lod.y) {
                 konecHry = true;
             }
         }
@@ -131,17 +131,17 @@ function update() {
 
     //střely
     for (let i = 0; i < poleStrel.length; i++) {
-        let bullet = poleStrel[i];
-        bullet.y += rychlostStrelY;
-        kontext.fillStyle="white";
-        kontext.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+        let strela = poleStrel[i];
+        strela.y += rychlostStrelY;
+        kontext.fillStyle="red";
+        kontext.fillRect(strela.x, strela.y, strela.width, strela.height);
 
         //kolie střel a mimozemšťanů
         for (let j = 0; j < poleMimozemstanu.length; j++) {
-            let alien = poleMimozemstanu[j];
-            if (!bullet.used && alien.alive && detectCollision(bullet, alien)) {
-                bullet.used = true;
-                alien.alive = false;
+            let vetrelec = poleMimozemstanu[j];
+            if (!strela.used && vetrelec.alive && detekceKolize(strela, vetrelec)) {
+                strela.used = true;
+                vetrelec.alive = false;
                 mimozemstanPocet--;
                 skore += 100;
             }
@@ -155,7 +155,7 @@ function update() {
 
     //další level
     if (mimozemstanPocet == 0) {
-        //zvýší počet mimozemšťanů v poli o 1
+        //zýší počet mimozemšťanů v poli o 1
         skore += mimozemstanSloupce * mimozemstanRady * 100; //bonusový bod :)
         mimozemstanSloupce = Math.min(mimozemstanSloupce + 1, sloupce/2 -2); //limitováno na 16/2 -2 = 6
         mimozemstanRady = Math.min(mimozemstanRady + 1, rady-4);  //limitováno na 16-4 = 12
@@ -167,38 +167,37 @@ function update() {
         }
         poleMimozemstanu = [];
         poleStrel = [];
-        createAliens();
+        vytvorMimozemstany();
     }
 
-    //score
+    //skore
     kontext.fillStyle="white";
     kontext.font="16px courier";
     kontext.fillText(skore, 5, 20);
 }
 
 // Funkce pro ukončení hry
-function endGame() {
-    // Vyzvání hráče k zadání jména a uložení skóre
+function upozorneniNaKonecHry() {
     let jmenoHrace = prompt("KONEC HRY! Zadejte vaše jméno:");
 
     if (jmenoHrace) {
-        // Uložení skóre do localStorage
         ulozNejvyssiSkore(jmenoHrace, skore);
-        // Zobrazení highscore
         zobrazNejvyssiSkore();
     }
 
     // Zeptat se hráče, jestli chce hrát znovu
-    let playAgain = confirm("Chcete hrát znovu?");
-    if (playAgain) {
-        restartGame(); // Restartujeme hru
+    let hratZnovu = confirm("Chcete hrát znovu?");
+    if (hratZnovu) {
+        restarHry(); // Restartujeme hru
         window.location.reload();
-    } else {
-        konecHry = true; // Konec hry
+    }
+    else {
+        alert("NESMYSL, DEJ SI TO JEŠTĚ JEDNOU!");
+        window.location.reload();
     }
 }
 
-function restartGame() {
+function restarHry() {
     // Obnovit herní stav
     skore = 0;
     konecHry = false;
@@ -209,14 +208,13 @@ function restartGame() {
     poleMimozemstanu = [];
     poleStrel = [];
     lod.x = lodX; // Původní pozice lodi
-    createAliens();
+    vytvorMimozemstany();
     requestAnimationFrame(update);
     
 }
 
-function moveShip(e) {
+function pohniLodi(e) {
     if (konecHry) {
-        endGame();
         return;
     }
 
@@ -228,7 +226,7 @@ function moveShip(e) {
     }
 }
 
-function createAliens() {
+function vytvorMimozemstany() {
     for (let c = 0; c < mimozemstanSloupce; c++) {
         for (let r = 0; r < mimozemstanRady; r++) {
             let alien = {
@@ -247,24 +245,23 @@ function createAliens() {
 
 function shoot(e) {
     if (konecHry) {
-        endGame();
         return;
     }
 
     if (e.code == "Space") {
         //střelba
-        let bullet = {
+        let strela = {
             x : lod.x + sirkaLode*15/32,
             y : lod.y,
             width : velikostDlazdice/8,
             height : velikostDlazdice/2,
             used : false
         }
-        poleStrel.push(bullet);
+        poleStrel.push(strela);
     }
 }
 
-function detectCollision(a, b) {
+function detekceKolize(a, b) {
     return a.x < b.x + b.width &&   
            a.x + a.width > b.x &&   
            a.y < b.y + b.height &&  
