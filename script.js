@@ -1,95 +1,90 @@
-//pole
-let tileSize = 32;
-let rows = 16;
-let columns = 16;
+//hranice hracího pole
+let velikostDlazdice = 32;
+let rady = 16;
+let sloupce = 16;
 
-let board;
-let boardWidth = tileSize * columns; // 32 * 16
-let boardHeight = tileSize * rows; // 32 * 16
-let context;
+let hraciPole;
+let sirkaHracihoPole = velikostDlazdice * sloupce; 
+let vyskaHracihoPole = velikostDlazdice * rady; 
+let kontext;
 
 //raketa
-let shipWidth = tileSize*2;
-let shipHeight = tileSize;
-let shipX = tileSize * columns/2 - tileSize;
-let shipY = tileSize * rows - tileSize*2;
+let sirkaLode = velikostDlazdice*2;
+let vyskaLode = velikostDlazdice;
+let lodX = velikostDlazdice * sloupce/2 - velikostDlazdice;
+let lodY = velikostDlazdice * rady - velikostDlazdice*2;
 
-let ship = {
-    x : shipX,
-    y : shipY,
-    width : shipWidth,
-    height : shipHeight
+let lod = {
+    x : lodX,
+    y : lodY,
+    width : sirkaLode,
+    height : vyskaLode
 }
 
-let shipImg;
-let shipVelocityX = tileSize; //rychlost lodi
+let lodImg;
+let rychlostLodeX = 1.5*velikostDlazdice;
 
 //mimozemšťani
-let alienArray = [];
-let alienWidth = tileSize*2;
-let alienHeight = tileSize;
-let alienX = tileSize;
-let alienY = tileSize;
-let alienImg;
+let poleMimozemstanu = [];
+let sirkaMimozemstana = velikostDlazdice*2;
+let vyskaMimozemstana = velikostDlazdice;
+let mimozemstanX = velikostDlazdice;
+let mimozemstanY = velikostDlazdice;
+let mimozemstanImg;
 
-let alienRows = 2;
-let alienColumns = 3;
-let alienCount = 0; //počet mimozemšťanů
-let alienVelocityX = 1; //rychlost pohybu mimozemšťanů
+let mimozemstanRady = 2;
+let mimozemstanSloupce = 3;
+let mimozemstanPocet = 0; 
+let mimozemstanRychlostX = 1; 
 
 //střely
-let bulletArray = [];
-let bulletVelocityY = -10; //rychlost pohybu kulek
+let poleStrel = [];
+let rychlostStrelY = -10;
 
-let score = 0;
-let gameOver = false;
+let skore = 0;
+let konecHry = false;
 
-// Funkce pro získání highscore z Local Storage
-function loadHighScores() {
-    const storedHighScores = localStorage.getItem('highScores');
-    if (storedHighScores) {
-        return JSON.parse(storedHighScores);
+
+function nahrajNejvyssiSkore() {
+    const ulozeneNejvyssiSkore = localStorage.getItem('nejvyssiSkore');
+    if (ulozeneNejvyssiSkore) {
+        return JSON.parse(ulozeneNejvyssiSkore);
     }
     return [];
 }
 
-// Funkce pro uložení nové highscore do Local Storage
-function saveHighScore(name, score) {
-    let highScores = loadHighScores();
-    highScores.push({ name, score });
-    // Seřadit podle skóre (od nejvyššího)
-    highScores.sort((a, b) => b.score - a.score);
-    // Udržet pouze 5 nejlepších skóre
-    highScores = highScores.slice(0, 5);
-    // Uložit do Local Storage
-    localStorage.setItem('highScores', JSON.stringify(highScores));
+function ulozNejvyssiSkore(name, score) {
+    let nejvyssiSkore = nahrajNejvyssiSkore();
+    nejvyssiSkore.push({ name, score });
+    nejvyssiSkore.sort((a, b) => b.score - a.score);
+    nejvyssiSkore = nejvyssiSkore.slice(0, 10);
+    localStorage.setItem('nejvyssiSkore', JSON.stringify(nejvyssiSkore));
 }
 
-// Funkce pro zobrazení seznamu nejlepších skóre v alertu
-function showHighScores() {
-    let highScores = loadHighScores();
-    let highScoreText = "Top 5 High Scores:\n";
-    highScores.forEach((score, index) => {
-        highScoreText += `${index + 1}. ${score.name} - ${score.score}\n`;
+function zobrazNejvyssiSkore() {
+    let nejvyssiSkore = nahrajNejvyssiSkore();
+    let nejvyssiSkoreText = "PĚT NEJVYŠŠÍCH SKÓRE:\n";
+    nejvyssiSkore.forEach((score, index) => {
+        nejvyssiSkoreText += `${index + 1}. ${score.name} - ${score.score}\n`;
     });
-    alert(highScoreText);
+    alert(nejvyssiSkoreText);
 }
 
 window.onload = function() {
-    board = document.getElementById("board");
-    board.width = boardWidth;
-    board.height = boardHeight;
-    context = board.getContext("2d");
+    hraciPole = document.getElementById("board");
+    hraciPole.width = sirkaHracihoPole;
+    hraciPole.height = vyskaHracihoPole;
+    kontext = hraciPole.getContext("2d");
 
     //load images
-    shipImg = new Image();
-    shipImg.src = "./ship.png";
-    shipImg.onload = function() {
-        context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
+    lodImg = new Image();
+    lodImg.src = "./lod.png";
+    lodImg.onload = function() {
+        kontext.drawImage(lodImg, lod.x, lod.y, lod.width, lod.height);
     }
 
-    alienImg = new Image();
-    alienImg.src = "./alien.png";
+    mimozemstanImg = new Image();
+    mimozemstanImg.src = "./mimozemstan.png";
     createAliens();
 
     requestAnimationFrame(update);
@@ -100,153 +95,158 @@ window.onload = function() {
 function update() {
     requestAnimationFrame(update);
 
-    if (gameOver) {
+    if (konecHry) {
         endGame();
         return;
     }
 
-    context.clearRect(0, 0, board.width, board.height);
+    kontext.clearRect(0, 0, hraciPole.width, hraciPole.height);
 
     //loď
-    context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
+    kontext.drawImage(lodImg, lod.x, lod.y, lod.width, lod.height);
 
     //mimozemšťan
-    for (let i = 0; i < alienArray.length; i++) {
-        let alien = alienArray[i];
+    for (let i = 0; i < poleMimozemstanu.length; i++) {
+        let alien = poleMimozemstanu[i];
         if (alien.alive) {
-            alien.x += alienVelocityX;
+            alien.x += mimozemstanRychlostX;
 
             //když se mimozemšťan dotkne hranice pole
-            if (alien.x + alien.width >= board.width || alien.x <= 0) {
-                alienVelocityX *= -1;
-                alien.x += alienVelocityX*2;
+            if (alien.x + alien.width >= hraciPole.width || alien.x <= 0) {
+                mimozemstanRychlostX *= -1;
+                alien.x += mimozemstanRychlostX*2;
 
                 //pohyb všech mimozemšťanů v řadě
-                for (let j = 0; j < alienArray.length; j++) {
-                    alienArray[j].y += alienHeight;
+                for (let j = 0; j < poleMimozemstanu.length; j++) {
+                    poleMimozemstanu[j].y += vyskaMimozemstana;
                 }
             }
-            context.drawImage(alienImg, alien.x, alien.y, alien.width, alien.height);
+            kontext.drawImage(mimozemstanImg, alien.x, alien.y, alien.width, alien.height);
 
-            if (alien.y >= ship.y) {
-                gameOver = true;
+            if (alien.y >= lod.y) {
+                konecHry = true;
             }
         }
     }
 
     //střely
-    for (let i = 0; i < bulletArray.length; i++) {
-        let bullet = bulletArray[i];
-        bullet.y += bulletVelocityY;
-        context.fillStyle="white";
-        context.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+    for (let i = 0; i < poleStrel.length; i++) {
+        let bullet = poleStrel[i];
+        bullet.y += rychlostStrelY;
+        kontext.fillStyle="white";
+        kontext.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
 
         //kolie střel a mimozemšťanů
-        for (let j = 0; j < alienArray.length; j++) {
-            let alien = alienArray[j];
+        for (let j = 0; j < poleMimozemstanu.length; j++) {
+            let alien = poleMimozemstanu[j];
             if (!bullet.used && alien.alive && detectCollision(bullet, alien)) {
                 bullet.used = true;
                 alien.alive = false;
-                alienCount--;
-                score += 100;
+                mimozemstanPocet--;
+                skore += 100;
             }
         }
     }
 
     //vyčištění střel
-    while (bulletArray.length > 0 && (bulletArray[0].used || bulletArray[0].y < 0)) {
-        bulletArray.shift(); //odstraní první eleent z pole
+    while (poleStrel.length > 0 && (poleStrel[0].used || poleStrel[0].y < 0)) {
+        poleStrel.shift(); //odstraní první eleent z pole
     }
 
     //další level
-    if (alienCount == 0) {
+    if (mimozemstanPocet == 0) {
         //zvýší počet mimozemšťanů v poli o 1
-        score += alienColumns * alienRows * 100; //bonusový bod :)
-        alienColumns = Math.min(alienColumns + 1, columns/2 -2); //limitováno na 16/2 -2 = 6
-        alienRows = Math.min(alienRows + 1, rows-4);  //limitováno na 16-4 = 12
-        if (alienVelocityX > 0) {
-            alienVelocityX += 0.2; //zrychlení hybnosti mimozemšťanů vpravo
+        skore += mimozemstanSloupce * mimozemstanRady * 100; //bonusový bod :)
+        mimozemstanSloupce = Math.min(mimozemstanSloupce + 1, sloupce/2 -2); //limitováno na 16/2 -2 = 6
+        mimozemstanRady = Math.min(mimozemstanRady + 1, rady-4);  //limitováno na 16-4 = 12
+        if (mimozemstanRychlostX > 0) {
+            mimozemstanRychlostX += 0.2; //zrychlení hybnosti mimozemšťanů vpravo
         }
         else {
-            alienVelocityX -= 0.2; //zrychlení hybnosti mimozemšťanů vlevo
+            mimozemstanRychlostX -= 0.2; //zrychlení hybnosti mimozemšťanů vlevo
         }
-        alienArray = [];
-        bulletArray = [];
+        poleMimozemstanu = [];
+        poleStrel = [];
         createAliens();
     }
 
     //score
-    context.fillStyle="white";
-    context.font="16px courier";
-    context.fillText(score, 5, 20);
+    kontext.fillStyle="white";
+    kontext.font="16px courier";
+    kontext.fillText(skore, 5, 20);
 }
 
 // Funkce pro ukončení hry
 function endGame() {
     // Vyzvání hráče k zadání jména a uložení skóre
-    let playerName = prompt("KONEC HRY! Zadejte vaše jméno:");
+    let jmenoHrace = prompt("KONEC HRY! Zadejte vaše jméno:");
 
-    if (playerName) {
+    if (jmenoHrace) {
         // Uložení skóre do localStorage
-        saveHighScore(playerName, score);
+        ulozNejvyssiSkore(jmenoHrace, skore);
         // Zobrazení highscore
-        showHighScores();
+        zobrazNejvyssiSkore();
     }
 
     // Zeptat se hráče, jestli chce hrát znovu
     let playAgain = confirm("Chcete hrát znovu?");
     if (playAgain) {
         restartGame(); // Restartujeme hru
+        window.location.reload();
     } else {
-        gameOver = true; // Konec hry
+        konecHry = true; // Konec hry
     }
 }
 
 function restartGame() {
     // Obnovit herní stav
-    score = 0;
-    gameOver = false;
-    alienCount = 0;
-    alienArray = [];
-    bulletArray = [];
-    ship.x = shipX; // Původní pozice lodi
+    skore = 0;
+    konecHry = false;
+    mimozemstanPocet = 0;
+    mimozemstanRady = 2;
+    mimozemstanSloupce = 3;
+    mimozemstanRychlostX = 1;
+    poleMimozemstanu = [];
+    poleStrel = [];
+    lod.x = lodX; // Původní pozice lodi
     createAliens();
     requestAnimationFrame(update);
+    
 }
 
 function moveShip(e) {
-    if (gameOver) {
+    if (konecHry) {
         endGame();
         return;
     }
 
-    if (e.code == "ArrowLeft" && ship.x - shipVelocityX >= 0) {
-        ship.x -= shipVelocityX; //pohyb lodi vlevo
+    if (e.code == "ArrowLeft" && lod.x - rychlostLodeX >= 0) {
+        lod.x -= rychlostLodeX; //pohyb lodi vlevo
     }
-    else if (e.code == "ArrowRight" && ship.x + shipVelocityX + ship.width <= board.width) {
-        ship.x += shipVelocityX; //pohyb lodi vpravo
+    else if (e.code == "ArrowRight" && lod.x + rychlostLodeX + lod.width <= hraciPole.width) {
+        lod.x += rychlostLodeX; //pohyb lodi vpravo
     }
 }
 
 function createAliens() {
-    for (let c = 0; c < alienColumns; c++) {
-        for (let r = 0; r < alienRows; r++) {
+    for (let c = 0; c < mimozemstanSloupce; c++) {
+        for (let r = 0; r < mimozemstanRady; r++) {
             let alien = {
-                img : alienImg,
-                x : alienX + c*alienWidth,
-                y : alienY + r*alienHeight,
-                width : alienWidth,
-                height : alienHeight,
+                img : mimozemstanImg,
+                x : mimozemstanX + c*sirkaMimozemstana,
+                y : mimozemstanY + r*vyskaMimozemstana,
+                width : sirkaMimozemstana,
+                height : vyskaMimozemstana,
                 alive : true
             }
-            alienArray.push(alien);
+            poleMimozemstanu.push(alien);
         }
     }
-    alienCount = alienArray.length;
+    mimozemstanPocet = poleMimozemstanu.length;
 }
 
 function shoot(e) {
-    if (gameOver) {
+    if (konecHry) {
         endGame();
         return;
     }
@@ -254,13 +254,13 @@ function shoot(e) {
     if (e.code == "Space") {
         //střelba
         let bullet = {
-            x : ship.x + shipWidth*15/32,
-            y : ship.y,
-            width : tileSize/8,
-            height : tileSize/2,
+            x : lod.x + sirkaLode*15/32,
+            y : lod.y,
+            width : velikostDlazdice/8,
+            height : velikostDlazdice/2,
             used : false
         }
-        bulletArray.push(bullet);
+        poleStrel.push(bullet);
     }
 }
 
