@@ -1,44 +1,41 @@
-class GameView {
-    constructor(canvas) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext("2d");
+export class GameView {
+    constructor(context, board, shipImgSrc, alienImgSrc) {
+        this.context = context;
+        this.board = board;
+
+        this.shipImg = new Image();
+        this.shipImg.src = shipImgSrc;
+
+        this.alienImg = new Image();
+        this.alienImg.src = alienImgSrc;
     }
 
-    drawPlayer(player) {
-        const playerImage = new Image();
-        playerImage.src = "player.png";
-        this.ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+    drawShip(ship) {
+        this.context.drawImage(this.shipImg, ship.x, ship.y, ship.width, ship.height);
     }
 
     drawAliens(aliens) {
-        const alienImage = new Image();
-        alienImage.src = "alien.png";
-        for (let alien of aliens) {
-            this.ctx.drawImage(alienImage, alien.x, alien.y, alien.width, alien.height);
-        }
+        aliens.forEach((alien) => {
+            if (alien.alive) {
+                this.context.drawImage(this.alienImg, alien.x, alien.y, alien.width, alien.height);
+            }
+        });
     }
 
     drawBullets(bullets) {
-        this.ctx.fillStyle = "red";
-        for (let bullet of bullets) {
-            this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-        }
-    }
-
-    displayText(message) {
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "30px Arial";
-        this.ctx.textAlign = "center";
-        this.ctx.fillText(message, this.canvas.width / 2, this.canvas.height / 2);
-    }
-
-    updateHighScoreTable(highScores) {
-        const scoreList = document.getElementById("scoreList");
-        scoreList.innerHTML = "";
-        highScores.forEach((score) => {
-            const li = document.createElement("li");
-            li.textContent = `${score.name}: ${score.score}`;
-            scoreList.appendChild(li);
+        this.context.fillStyle = "white";
+        bullets.forEach((bullet) => {
+            this.context.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
         });
+    }
+
+    clearBoard() {
+        this.context.clearRect(0, 0, this.board.width, this.board.height);
+    }
+
+    drawScore(score) {
+        this.context.fillStyle = "white";
+        this.context.font = "16px courier";
+        this.context.fillText(score, 5, 20);
     }
 }
