@@ -1,7 +1,10 @@
+# Space Invaders
+![Snímek obrazovky](snimek_prohlizece.jpg)
+
 # Popis projektu
 
 Tento projekt je jednoduchá arkádová hra vytvořená pomocí JavaScriptu, kde hráč ovládá vesmírný člun, střílí na mimozemšťany a sbírá body. Projekt je rozdělen do tří samostatných souborů dle principů architektury MVC (Model-View-Controller):
-
+![Mimozemšťan](alien.png)
 - **model.js**: Obsahuje logiku a data hry (model).
 - **view.js**: Zajišťuje vykreslování hry (view).
 - **controller.js**: Ovládá interakci mezi modelem a pohledem (controller).
@@ -34,11 +37,11 @@ Tento projekt je jednoduchá arkádová hra vytvořená pomocí JavaScriptu, kde
 ```
 /game
 |-- index.html          # Hlavní HTML soubor
-|-- style.css           # Styl hry (volitelné)
+|-- style.css           # Styl hry
 |-- model.js            # Herní logika a data
 |-- view.js             # Vykreslování hry
 |-- controller.js       # Ovládání hry
-|-- assets/             # Složka s obrázky (např. ship.png, alien.png)
+|-- galerie/            # Složka s obrázky
 ```
 
 ## Instalace a spuštění
