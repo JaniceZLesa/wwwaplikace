@@ -24,7 +24,7 @@ let lod = {
 let lodImg;
 let rychlostLodeX = 1.5*velikostDlazdice;
 
-//mimozemšťani
+//alieni
 let poleMimozemstanu = [];
 let sirkaMimozemstana = velikostDlazdice*2;
 let vyskaMimozemstana = velikostDlazdice;
@@ -57,17 +57,19 @@ function ulozNejvyssiSkore(name, score) {
     let nejvyssiSkore = nahrajNejvyssiSkore();
     nejvyssiSkore.push({ name, score });
     nejvyssiSkore.sort((a, b) => b.score - a.score);
-    nejvyssiSkore = nejvyssiSkore.slice(0, 10);
+    nejvyssiSkore = nejvyssiSkore.slice(0, 5);
     localStorage.setItem('nejvyssiSkore', JSON.stringify(nejvyssiSkore));
 }
 
 function zobrazNejvyssiSkore() {
     let nejvyssiSkore = nahrajNejvyssiSkore();
-    let nejvyssiSkoreText = "PĚT NEJVYŠŠÍCH SKÓRE:\n";
+    let seznamElement = document.getElementById("nejvyssiSkoreSeznam");
+    seznamElement.innerHTML = "";
     nejvyssiSkore.forEach((score, index) => {
-        nejvyssiSkoreText += `${index + 1}. ${score.name} - ${score.score}\n`;
+        let polozka = document.createElement("li");
+        polozka.textContent = `${index + 1}. ${score.name} - ${score.score}`;
+        seznamElement.appendChild(polozka);
     });
-    alert(nejvyssiSkoreText);
 }
 
 window.onload = function() {
@@ -75,6 +77,7 @@ window.onload = function() {
     hraciPole.width = sirkaHracihoPole;
     hraciPole.height = vyskaHracihoPole;
     kontext = hraciPole.getContext("2d");
+    zobrazNejvyssiSkore();
 
     //obrázky
     lodImg = new Image();
@@ -160,10 +163,10 @@ function update() {
         mimozemstanSloupce = Math.min(mimozemstanSloupce + 1, sloupce/2 -2); //limitováno na 16/2 -2 = 6
         mimozemstanRady = Math.min(mimozemstanRady + 1, rady-4);  //limitováno na 16-4 = 12
         if (mimozemstanRychlostX > 0) {
-            mimozemstanRychlostX += 0.2; //zrychlení hybnosti mimozemšťanů vpravo
+            mimozemstanRychlostX += 0.2;
         }
         else {
-            mimozemstanRychlostX -= 0.2; //zrychlení hybnosti mimozemšťanů vlevo
+            mimozemstanRychlostX -= 0.2;
         }
         poleMimozemstanu = [];
         poleStrel = [];
@@ -176,19 +179,16 @@ function update() {
     kontext.fillText(skore, 5, 20);
 }
 
-// Funkce pro ukončení hry
 function upozorneniNaKonecHry() {
     let jmenoHrace = prompt("KONEC HRY! Zadejte vaše jméno:");
 
     if (jmenoHrace) {
         ulozNejvyssiSkore(jmenoHrace, skore);
-        zobrazNejvyssiSkore();
     }
 
-    // Zeptat se hráče, jestli chce hrát znovu
     let hratZnovu = confirm("Chcete hrát znovu?");
     if (hratZnovu) {
-        restarHry(); // Restartujeme hru
+        restarHry();
         window.location.reload();
     }
     else {
@@ -197,8 +197,8 @@ function upozorneniNaKonecHry() {
     }
 }
 
+//restart
 function restarHry() {
-    // Obnovit herní stav
     skore = 0;
     konecHry = false;
     mimozemstanPocet = 0;
@@ -207,7 +207,7 @@ function restarHry() {
     mimozemstanRychlostX = 1;
     poleMimozemstanu = [];
     poleStrel = [];
-    lod.x = lodX; // Původní pozice lodi
+    lod.x = lodX;
     vytvorMimozemstany();
     requestAnimationFrame(update);
     
