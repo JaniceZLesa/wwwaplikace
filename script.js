@@ -191,10 +191,6 @@ function upozorneniNaKonecHry() {
         restarHry();
         window.location.reload();
     }
-    else {
-        alert("NESMYSL, DEJ SI TO JEŠTĚ JEDNOU!");
-        window.location.reload();
-    }
 }
 
 //restart
