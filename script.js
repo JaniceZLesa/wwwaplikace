@@ -192,7 +192,7 @@ function upozorneniNaKonecHry() {
         window.location.reload();
     }
     else {
-        self.close();}
+        window.close();}
     
 }
 
