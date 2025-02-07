@@ -188,13 +188,16 @@ function upozorneniNaKonecHry() {
 
     let hratZnovu = confirm("Chcete hrát znovu?");
     if (hratZnovu) {
-        restarHry();
+        restartHry();
         window.location.reload();
     }
+    else {
+        window.close();}
+    
 }
 
 //restart
-function restarHry() {
+function restartHry() {
     skore = 0;
     konecHry = false;
     mimozemstanPocet = 0;
